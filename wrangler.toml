@@ -1,0 +1,11 @@
+name = "verify"
+main = "src/index.js"
+compatibility_date = "2026-08-12"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "CURATOR_VERIFY_RECORDS"
+id = "bf7fb04aa1754f729acd62595bf21004"
+
+[observability]
+enabled = true
