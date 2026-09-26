@@ -70,3 +70,7 @@ Each verification stores the raw evidence used for the verdict, including HTTP s
 ## Design rule
 
 Verify never creates the original incident and never decides priority. It only adds an independent observation.
+
+## Disaster recovery
+
+The complete `CURATOR_VERIFY_RECORDS` namespace can be exported through authenticated `GET /api/recovery-export`. Configure the Worker secret `RECOVERY_EXPORT_TOKEN`; the route remains disabled if the secret is absent. See [`RECOVERY_EXPORT.md`](RECOVERY_EXPORT.md).
