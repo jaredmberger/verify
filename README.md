@@ -21,7 +21,7 @@ KV binding:
 - `CURATOR_VERIFY_RECORDS`
 - namespace id: `bf7fb04aa1754f729acd62595bf21004`
 
-Set a Worker secret named `VERIFY_WRITE_KEY` before using the write API. Do not commit that value to GitHub.
+Set a Worker secret named `VERIFY_WRITE_KEY` before using the verification write API or reading retained verification history. Both fail closed when the secret is absent. Do not commit that value to GitHub.
 
 ## Endpoints
 
@@ -33,6 +33,12 @@ Returns service health and configuration state.
 
 ### `GET /api/recent?limit=20`
 Returns recent verification records from KV.
+
+Requires header:
+
+`x-curator-verify-key: <VERIFY_WRITE_KEY>`
+
+Retained verification history is operator evidence and is not a public status surface.
 
 ### `POST /api/verify`
 Requires header:
