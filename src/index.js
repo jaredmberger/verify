@@ -30,6 +30,8 @@ export default {
     }
 
     if (request.method === 'GET' && url.pathname === '/api/recent') {
+      const authError = requireVerifyKey(request, env);
+      if (authError) return authError;
       requireKv(env);
       const limit = clampInt(url.searchParams.get('limit'), 1, 50, 20);
       const listed = await env[KV].list({ prefix: RECORD_PREFIX, limit });
@@ -43,13 +45,8 @@ export default {
     }
 
     if (request.method === 'POST' && url.pathname === '/api/verify') {
-      if (!env.VERIFY_WRITE_KEY) {
-        return json({ ok: false, error: 'VERIFY_WRITE_KEY secret is not configured.' }, 503);
-      }
-      const supplied = request.headers.get('x-curator-verify-key') || '';
-      if (!safeEqual(supplied, env.VERIFY_WRITE_KEY)) {
-        return json({ ok: false, error: 'Unauthorized.' }, 401);
-      }
+      const authError = requireVerifyKey(request, env);
+      if (authError) return authError;
 
       requireKv(env);
       let input;
@@ -70,6 +67,16 @@ export default {
     return json({ ok: false, error: 'Not found.' }, 404);
   }
 };
+
+function requireVerifyKey(request, env) {
+  if (!env.VERIFY_WRITE_KEY) {
+    return json({ ok: false, error: 'VERIFY_WRITE_KEY secret is not configured.' }, 503);
+  }
+  const supplied = request.headers.get('x-curator-verify-key') || '';
+  return safeEqual(supplied, env.VERIFY_WRITE_KEY)
+    ? null
+    : json({ ok: false, error: 'Unauthorized.' }, 401);
+}
 
 function validateRequest(input) {
   if (!input || typeof input !== 'object') return { ok: false, error: 'Request body must be an object.' };
