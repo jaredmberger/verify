@@ -10,3 +10,12 @@ test('Verify recovery export safety boundary',async()=>{
   assert.match(source,/list_complete/);
   assert.match(source,/dataSha256/);
 });
+
+
+test('Verify retained history is protected by the write key boundary',async()=>{
+  const source=await readFile(new URL('../src/index.js',import.meta.url),'utf8');
+  assert.match(source,/GET' && url\.pathname === '\/api\/recent'/);
+  assert.match(source,/requireVerifyKey\(request, env\)/);
+  assert.match(source,/VERIFY_WRITE_KEY/);
+  assert.match(source,/x-curator-verify-key/);
+});
